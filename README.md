@@ -345,26 +345,29 @@ flowchart TD
   - [ ] LPop/RPop - Remove elements from left/right
   - [ ] LRange - Get range elements
   - [ ] LLen - Get list length
-  - [ ] BLPop/BRPop - Blocking left/right pop
 - **Set Operations**
   - [ ] SAdd - Add element to set
   - [ ] SMembers - Get all set members
   - [ ] SRem - Remove element from set
   - [ ] SCard - Get set cardinality
   - [ ] SIsMember - Check if element is in set
-- **Sorted Set Operations**
-  - [ ] ZAdd - Add element to sorted set
-  - [ ] ZRange/ZRevRange - Get range by score
-  - [ ] ZRank/ZRevRank - Get element rank
-  - [ ] ZScore - Get element score
-  - [ ] ZRem - Remove element
-- **Pub/Sub**
-  - [ ] Publish - Publish message
-  - [ ] Subscribe - Subscribe to channel
-- **Lua Scripts**
-  - [ ] Eval/EvalSha - Execute Lua script
 
-  ## License
+### Can not be supported at fallback mode
+- **List Operations**
+  - BLPop/BRPop - Blocking left/right pop
+- **Sorted Set Operations**
+  - ZAdd - Add element to sorted set
+  - ZRange/ZRevRange - Get range by score
+  - ZRank/ZRevRank - Get element rank<
+  - ZScore - Get element score
+  - ZRem - Remove element
+- **Pub/Sub**
+  - Publish - Publish message
+  - Subscribe - Subscribe to channel
+- **Lua Scripts**
+  - Eval/EvalSha - Execute Lua script
+
+## License
 
 This source code project is licensed under the [MIT](https://github.com/pardnchiu/FlexPlyr/blob/main/LICENSE) license.
 
