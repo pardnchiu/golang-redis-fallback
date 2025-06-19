@@ -1,5 +1,5 @@
 # Redis Fallback (Golang)
-A Redis client package with automatic fallback functionality that automatically downgrades to local file storage when Redis is unavailable and synchronizes data when Redis recovers.
+A Redis fallback for Golang that automatically degrades to local storage, ensuring minimal data loss during fallback and seamless recovery when Redis becomes available again.
 
 ## Key Features
 
