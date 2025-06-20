@@ -1,4 +1,4 @@
-module github.com/pardnchiu/golang-redis-fallback
+module github.com/pardnchiu/go-redis-fallback
 
 go 1.24.3
 

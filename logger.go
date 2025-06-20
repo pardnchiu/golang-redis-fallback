@@ -12,7 +12,7 @@ import (
 )
 
 type Log struct {
-	Path    string `json:"path,omitempty"`     // 日誌檔案路徑，預設 `./logs/golangRedisFallback`
+	Path    string `json:"path,omitempty"`     // 日誌檔案路徑，預設 `./logs/redisFallback`
 	Stdout  bool   `json:"stdout,omitempty"`   // 是否輸出到標準輸出，預設 false
 	MaxSize int64  `json:"max_size,omitempty"` // 日誌檔案最大大小（位元組），預設 16 * 1024 * 1024
 }

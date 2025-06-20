@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	rf "github.com/pardnchiu/golang-redis-fallback"
+	rf "github.com/pardnchiu/go-redis-fallback"
 )
 
 func main() {

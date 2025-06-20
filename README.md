@@ -20,7 +20,7 @@ A Redis fallback for Golang that automatically degrades to local storage, ensuri
 
 ### Installation
 ```bash
-go get github.com/pardnchiu/golangRedisFallback
+go get github.com/pardnchiu/go-redis-fallback
 ```
 
 ### Basic Usage
@@ -31,7 +31,7 @@ import (
   "log"
   "time"
   
-  rf "github.com/pardnchiu/golangRedisFallback"
+  rf "github.com/pardnchiu/go-redis-fallback"
 )
 
 func main() {
@@ -44,12 +44,12 @@ func main() {
       DB:       0,
     },
     Log: &rf.Log{
-      Path:    "./logs/golangRedisFallback",
+      Path:    "./logs/redisFallback",
       Stdout:  true,
       MaxSize: 16 * 1024 * 1024, // 16MB
     },
     Options: &rf.Options{
-      DBPath:      "./files/golangRedisFallback/db",
+      DBPath:      "./files/redisFallback/db",
       MaxRetry:    3,
       MaxQueue:    1000,
       TimeToWrite: 3 * time.Second,
@@ -93,13 +93,13 @@ type Config struct {
   }
 
   Log *Log {
-    Path    string // Log file path (default: ./logs/golangRedisFallback)
+    Path    string // Log file path (default: ./logs/redisFallback)
     Stdout  bool   // Output to stdout (default: false)
     MaxSize int64  // Maximum log file size (default: 16MB)
   }
 
   Options *Options {
-    DBPath      string        // File storage path (default: ./files/golangRedisFallback/db)
+    DBPath      string        // File storage path (default: ./files/redisFallback/db)
     MaxRetry    int           // Redis retry count (default: 3)
     MaxQueue    int           // Write queue size (default: 1000)
     TimeToWrite time.Duration // Batch write interval (default: 3 seconds)
@@ -158,7 +158,7 @@ type Config struct {
 Uses MD5 encoding to implement layered directories, avoiding too many files in a single directory:
 
 ```
-./files/golangRedisFallback/db/
+{filepath}/db/
 ├── 0/                   # Redis DB
 │   ├── ab/              # First 2 chars of MD5
 │   │   ├── cd/          # 3rd-4th chars of MD5

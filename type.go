@@ -10,9 +10,9 @@ import (
 )
 
 const (
-	defaultLogPath     = "./logs/golangRedisFallback"
+	defaultLogPath     = "./logs/redisFallback"
 	defaultLogMaxSize  = 16 * 1024 * 1024
-	defaultDBPath      = "./files/golangRedisFallback/db"
+	defaultDBPath      = "./files/redisFallback/db"
 	defaultMaxRetry    = 3
 	defaultMaxQueue    = 1000            // 最大排隊長度，預設 1000
 	defaultTimeToWrite = 3 * time.Second // 預設 Fallback 模式下寫入時間間隔
