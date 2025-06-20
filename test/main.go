@@ -7,28 +7,28 @@ import (
 	"sync"
 	"time"
 
-	golangRedisFallback "github.com/pardnchiu/golang-redis-fallback"
+	rf "github.com/pardnchiu/golang-redis-fallback"
 )
 
 func main() {
 	fmt.Println("=== Redis Fallback Package Test Suite ===")
 
 	// Configuration setup
-	config := golangRedisFallback.Config{
-		Redis: &golangRedisFallback.Redis{
+	config := rf.Config{
+		Redis: &rf.Redis{
 			Host:     "localhost",
 			Port:     6379,
 			Password: "0123456789",
 			DB:       0,
 		},
-		Log: &golangRedisFallback.Log{
+		Log: &rf.Log{
 			Stdout: true,
 		},
 		// 不設定 Options，使用預設值
 	}
 
 	// Create Redis Fallback instance
-	cache, err := golangRedisFallback.New(config)
+	cache, err := rf.New(config)
 	if err != nil {
 		log.Fatalf("Failed to create cache instance: %v", err)
 	}
@@ -60,7 +60,7 @@ func main() {
 	time.Sleep(30 * time.Second)
 }
 
-func testBasicOperations(cache *golangRedisFallback.RedisFallback) bool {
+func testBasicOperations(cache *rf.RedisFallback) bool {
 	fmt.Println("\n--- Testing Basic Operations ---")
 	success := true
 
@@ -113,7 +113,7 @@ func testBasicOperations(cache *golangRedisFallback.RedisFallback) bool {
 	return success
 }
 
-func testTTLOperations(cache *golangRedisFallback.RedisFallback) bool {
+func testTTLOperations(cache *rf.RedisFallback) bool {
 	fmt.Println("\n--- Testing TTL Operations ---")
 	success := true
 
@@ -164,7 +164,7 @@ func testTTLOperations(cache *golangRedisFallback.RedisFallback) bool {
 	return success
 }
 
-func testComplexDataTypes(cache *golangRedisFallback.RedisFallback) bool {
+func testComplexDataTypes(cache *rf.RedisFallback) bool {
 	fmt.Println("\n--- Testing Complex Data Types ---")
 	success := true
 
@@ -242,7 +242,7 @@ func testComplexDataTypes(cache *golangRedisFallback.RedisFallback) bool {
 	return success
 }
 
-func testBatchOperations(cache *golangRedisFallback.RedisFallback) bool {
+func testBatchOperations(cache *rf.RedisFallback) bool {
 	fmt.Println("\n--- Testing Batch Operations ---")
 	success := true
 	start := time.Now()
@@ -282,7 +282,7 @@ func testBatchOperations(cache *golangRedisFallback.RedisFallback) bool {
 	return success
 }
 
-func testConcurrentOperations(cache *golangRedisFallback.RedisFallback) bool {
+func testConcurrentOperations(cache *rf.RedisFallback) bool {
 	fmt.Println("\n--- Testing Concurrent Operations ---")
 	success := true
 	start := time.Now()
@@ -334,7 +334,7 @@ func testConcurrentOperations(cache *golangRedisFallback.RedisFallback) bool {
 	return success
 }
 
-func testDeleteOperations(cache *golangRedisFallback.RedisFallback) bool {
+func testDeleteOperations(cache *rf.RedisFallback) bool {
 	fmt.Println("\n--- Testing Delete Operations ---")
 	success := true
 
@@ -385,7 +385,7 @@ func testDeleteOperations(cache *golangRedisFallback.RedisFallback) bool {
 	return success
 }
 
-func testErrorHandling(cache *golangRedisFallback.RedisFallback) bool {
+func testErrorHandling(cache *rf.RedisFallback) bool {
 	fmt.Println("\n--- Testing Error Handling ---")
 	success := true
 
@@ -413,7 +413,7 @@ func testErrorHandling(cache *golangRedisFallback.RedisFallback) bool {
 	return success
 }
 
-func testFallbackMode(cache *golangRedisFallback.RedisFallback) {
+func testFallbackMode(cache *rf.RedisFallback) {
 	fmt.Println("\n--- Testing Fallback Mode ---")
 	fmt.Println("This test writes data continuously. Stop/restart Redis during execution to test fallback.")
 	fmt.Println("Test duration: 60 seconds")

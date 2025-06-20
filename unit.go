@@ -1,4 +1,4 @@
-package golangRedisFallback
+package redisFallback
 
 import (
 	"crypto/md5"
