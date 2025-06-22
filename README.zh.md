@@ -1,7 +1,7 @@
 # Redis Fallback (Golang)
 
 > 一個 Redis 容錯套件，當 Redis 不可用時自動降級至本地存儲，確保回退期間的最小資料遺失，並在 Redis 恢復可用時實現無縫復原。<br>
-> 延伸自 [php-redis](https://github.com/pardnchiu/php-redis)、[php-cookie-fallback](https://github.com/pardnchiu/php-cookie-fallback) 和 [php-session-fallback](https://github.com/pardnchiu/php-session-fallback) 的整合概念，為 Golang 提供統一解決方案。
+> 延伸自 [php-redis](https://github.com/pardnchiu/php-redis)、[php-cache-fallback](https://github.com/pardnchiu/php-cache-fallback) 和 [php-session-fallback](https://github.com/pardnchiu/php-session-fallback) 的整合概念，為 Golang 提供統一解決方案。
 
 [![license](https://img.shields.io/github/license/pardnchiu/go-redis-fallback)](https://github.com/pardnchiu/go-redis-fallback/blob/main/LICENSE)
 [![version](https://img.shields.io/github/v/tag/pardnchiu/go-redis-fallback)](https://github.com/pardnchiu/go-redis-fallback/releases)

@@ -1,7 +1,7 @@
 # Redis Fallback (Golang)
 
 > A Redis fallback package that automatically degrades to local storage, ensuring minimal data loss during fallback and seamless recovery when Redis becomes available again.<br>
-> Extended from the integration concept of [php-redis](https://github.com/pardnchiu/php-redis), [php-cookie-fallback](https://github.com/pardnchiu/php-cookie-fallback), and [php-session-fallback](https://github.com/pardnchiu/php-session-fallback), providing a unified solution for Golang.
+> Extended from the integration concept of [php-redis](https://github.com/pardnchiu/php-redis), [php-cache-fallback](https://github.com/pardnchiu/php-cache-fallback), and [php-session-fallback](https://github.com/pardnchiu/php-session-fallback), providing a unified solution for Golang.
 
 [![license](https://img.shields.io/github/license/pardnchiu/go-redis-fallback)](https://github.com/pardnchiu/go-redis-fallback/blob/main/LICENSE)
 [![version](https://img.shields.io/github/v/tag/pardnchiu/go-redis-fallback)](https://github.com/pardnchiu/go-redis-fallback/releases)
