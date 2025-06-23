@@ -1,22 +1,30 @@
+> [!Note]
+> This content is translated by LLM. Original text can be found [here](README.zh.md)
+
 # Redis Fallback (Golang)
 
-> A Redis fallback package that automatically degrades to local storage, ensuring minimal data loss during fallback and seamless recovery when Redis becomes available again.<br>
-> Extended from the integration concept of [php-redis](https://github.com/pardnchiu/php-redis), [php-cache-fallback](https://github.com/pardnchiu/php-cache-fallback), and [php-session-fallback](https://github.com/pardnchiu/php-session-fallback), providing a unified solution for Golang.
+> A Golang Redis fallback solution that automatically downgrades to local storage when connections are unavailable and implements automatic recovery when connections are restored.<br>
+> Extended from the integrated concepts of [php-redis](https://github.com/pardnchiu/php-redis), [php-cache-fallback](https://github.com/pardnchiu/php-cache-fallback), and [php-session-fallback](https://github.com/pardnchiu/php-session-fallback), providing a unified solution for Golang.
 
-[![license](https://img.shields.io/github/license/pardnchiu/go-redis-fallback)](https://github.com/pardnchiu/go-redis-fallback/blob/main/LICENSE)
+[![license](https://img.shields.io/github/license/pardnchiu/go-redis-fallback)](LICENSE)
 [![version](https://img.shields.io/github/v/tag/pardnchiu/go-redis-fallback)](https://github.com/pardnchiu/go-redis-fallback/releases)
-[![readme](https://img.shields.io/badge/readme-中文-blue)](https://github.com/pardnchiu/go-redis-fallback/blob/main/README.zh.md)
+[![readme](https://img.shields.io/badge/readme-中文-blue)](README.zh.md)
 
-## Three key features
+## Three Core Features
 
-- **Three-tier Storage Architecture**: Memory cache + Redis + Local file storage with automatic fallback
-- **Automatic Recovery**: Periodically monitors Redis health status and batch synchronizes data after recovery
-- **Data Persistence**: Stores data as JSON files during fallback mode to prevent data loss with TTL support
+### Three-Tier Storage Architecture
+Memory cache + Redis + Local file storage with automatic fault tolerance
 
-## Flow
+### Graceful Degradation with Auto Recovery 
+During degradation, Redis health status is monitored periodically, automatically syncing data and cleaning local files when connection is restored
+
+### Data Integrity Assurance
+Data is stored as JSON files during fallback mode to prevent loss, with TTL support
+
+## Flow Chart
 
 <details>
-<summary>Click to show</summary>
+<summary>Click to view</summary>
 
 ```mermaid
 flowchart TD
@@ -27,7 +35,7 @@ flowchart TD
   
   subgraph "Initialization"
     B -->|Connection Success| B_1{Check Unsynced Files}
-    B_1 -->|Exist| B_1_1[Sync Data to Redis]
+    B_1 -->|Exists| B_1_1[Sync Data to Redis]
   end
   
   subgraph "Normal Mode"
@@ -45,7 +53,7 @@ flowchart TD
     F -->|Success| F_1[Write to Memory]
     F -->|Failed| F_0{Check Redis Connection}
 
-    F_0 -->|Connection Success, Attempts <= 3| E
+    F_0 -->|Connected, Retry <= 3| E
     end
   end
 
@@ -57,7 +65,7 @@ flowchart TD
   I_0_1 --> ReturnResult[Return Result]
 
   B_1_1 --> B_1_0
-  B_1 -->|Not Exist| B_1_0[Normal Mode]
+  B_1 -->|Not Exists| B_1_0[Normal Mode]
   B_1_0 --> C[Read Request]
   B_1_0 --> E[Write Request]
 
@@ -73,7 +81,7 @@ flowchart TD
     I_0 -->|Found| I_0_1[Update Memory Cache]
     end
     
-    subgraph "Fallback Mode Monitor"
+    subgraph "Fallback Mode Monitoring"
     J -->|Recovered| J_1[Execute Recovery Process]
     J -->|Not Recovered| J_0[Continue Fallback Mode]
     J_0 --> J
@@ -81,14 +89,14 @@ flowchart TD
     J_1 --> K[Sync Memory Data to Redis]
     K --> L[Sync JSON to Redis]
     L --> M{Sync Status}
-    M -->|Failed, Attempts <= 3| J_1
+    M -->|Failed, Retry <= 3| J_1
     end
 
     subgraph "Fallback Mode Write"
     N--> O[Update Memory Cache]
-    O --> P{DB Folder Exists}
-    P --> |Yes| P_1[Write Individual Files]
-    P --> |No| P_0[Create DB Folder]
+    O --> P{Database Folder Exists?}
+    P --> |Yes| P_1[Write Individual File]
+    P --> |No| P_0[Create Database Folder]
     P_0 --> P_1
     end
   end
@@ -98,7 +106,7 @@ flowchart TD
   H --> Q{Query Memory Cache}
   S -->|Not Found| I_0{Check JSON Exists}
 
-  subgraph "Memory Flow"
+  subgraph "Memory Process"
     subgraph "Memory Read"
     Q{Check Expiration} -->|Expired| Q_1[Remove Cache and Delete JSON]
     Q_1 --> |null| S
@@ -120,7 +128,7 @@ flowchart TD
 - [`github.com/redis/go-redis/v9`](https://github.com/redis/go-redis/v9)
 - [`github.com/pardnchiu/go-logger`](https://github.com/pardnchiu/go-logger)
 
-## How to use
+## Usage
 
 ### Installation
 ```bash
@@ -139,7 +147,6 @@ import (
 )
 
 func main() {
-  // Minimal configuration
   config := rf.Config{
     Redis: &rf.Redis{
       Host:     "localhost",
@@ -149,7 +156,7 @@ func main() {
     },
   }
 
-  // Initialize Redis fallback mechanism
+  // Initialize
   client, err := rf.New(config)
   if err != nil {
     log.Fatal(err)
@@ -173,26 +180,26 @@ func main() {
 }
 ```
 
-### Configuration Details
+## Configuration
 
 ```go
 type Config struct {
   Redis   *Redis   // Redis configuration (required)
-  Log     *Log     // Logging configuration (optional)
+  Log     *Log     // Log configuration (optional)
   Options *Options // System parameters and fallback settings (optional)
 }
 
 type Redis struct {
   Host     string // Redis server host address (required)
   Port     int    // Redis server port number (required)
-  Password string // Redis authentication password (optional, empty for no auth)
-  DB       int    // Redis database index (required, typically 0-15)
+  Password string // Redis authentication password (optional, empty means no auth)
+  DB       int    // Redis database index (required, usually 0-15)
 }
 
 type Log struct {
   Path      string // Log directory path (default: ./logs/redisFallback)
-  Stdout    bool   // Enable console output logging (default: false)
-  MaxSize   int64  // Maximum log file size before rotation in bytes (default: 16MB)
+  Stdout    bool   // Enable console log output (default: false)
+  MaxSize   int64  // Maximum size before log file rotation (bytes) (default: 16MB)
   MaxBackup int    // Number of rotated log files to retain (default: 5)
   Type      string // Output format: "json" for slog standard, "text" for tree format (default: "text")
 }
@@ -206,84 +213,64 @@ type Options struct {
 }
 ```
 
-## Supported Operations
+## Available Functions
 
-### Core Methods
+### Instance Management
 
-```go
-// Store data with optional TTL
-err := client.Set("key", value, ttl)
-
-// Retrieve data
-value, err := client.Get("key")
-
-// Delete data
-err := client.Del("key")
-
-// Close client and cleanup resources
-err := client.Close()
-```
-
-### Storage Modes
-
-```go
-// Normal Mode - Redis available
-// 1. Write to Redis first
-// 2. Update memory cache on success
-// 3. Background sync for consistency
-
-// Fallback Mode - Redis unavailable
-// 1. Update memory cache immediately
-// 2. Queue write operations
-// 3. Batch write to local files
-// 4. Monitor Redis health
-```
-
-## Core Features
-
-### Connection Management
-
-- **New** - Create new Redis fallback client
+- **New** - Create new fallback instance
   ```go
   client, err := rf.New(config)
   ```
   - Initialize Redis connection
   - Setup logging system
   - Check for unsynced files
-  - Start in appropriate mode
 
 - **Close** - Close Redis fallback client
   ```go
   err := client.Close()
   ```
   - Close Redis connection
-  - Flush pending writes
+  - Clear pending writes
   - Release system resources
 
-### Storage Features
+### Data Management
 
-- **Three-tier Architecture** - Memory cache as first layer, Redis as second, local files as fallback
+- **Set** - Insert data, automatically switch to local storage when Redis fails
   ```go
-  value, err := client.Get("key") // Checks memory → Redis → local files
+  err := client.Set("key", value, ttl)
   ```
 
-- **Automatic Fallback** - Seamlessly switch to local storage when Redis fails
+- **Get** - Get data, memory cache as first layer, Redis as second layer, local files as fallback
   ```go
-  err := client.Set("key", value, ttl) // Falls back to local storage on Redis failure
+  value, err := client.Get("key")
   ```
 
-- **Smart Recovery** - Batch synchronize data when Redis becomes available
+- **Del** - Delete data
   ```go
-  // Automatically triggered during health checks
-  // Syncs memory and file data back to Redis
+  err := client.Del("key")
   ```
 
-### Fallback Flow
+### Storage Modes
 
-- **Health Monitoring** - Periodic Redis connection checks
+```go
+// Normal Mode - Redis available
+// 1. Write to Redis first
+// 2. Update memory cache after success
+// 3. Background sync ensures consistency
+
+// Fallback Mode - Redis unavailable
+// 1. Immediately update memory cache
+// 2. Add write operations to queue
+// 3. Batch write to local files
+// 4. Monitor Redis health status
+```
+
+### Fallback Process
+
+- **Health Monitoring** - Periodically check Redis connection status
   ```go
-  // Automatically runs every TimeToCheck interval
-  // Attempts recovery when Redis is available
+  // Automatically executed every TimeToCheck interval
+  // Attempt recovery when Redis is available
   ```
 
 - **Batch Operations** - Optimize performance during fallback
@@ -293,30 +280,22 @@ err := client.Close()
   // Batch sync to Redis during recovery
   ```
 
-- **Data Persistence** - Layered file storage with MD5 encoding
+- **Data Persistence** - Layered file storage using MD5 encoding
   ```go
   // Files stored in nested directories based on key hash
-  // JSON format with metadata: key, data, type, timestamp, ttl
+  // JSON format contains metadata: key, data, type, timestamp, TTL
   ```
-
-## Security Features
-
-- **Data Integrity**: Consistent data across memory, Redis, and local storage
-- **Atomic Operations**: Prevent data corruption during mode transitions
-- **TTL Management**: Automatic expiration handling across all storage layers
-- **Layered Structure**: MD5-based directory structure prevents filesystem bottlenecks
-- **Concurrency Safety**: Thread-safe operations with proper locking mechanisms
 
 ## File Storage Structure
 
-Uses MD5 encoding to implement layered directories:
+Using MD5 encoding for layered directories:
 
 ```
 {DBPath}/db/
-├── 0/                   # Redis DB number
-│   ├── ab/              # First 2 chars of MD5
-│   │   ├── cd/          # 3rd-4th chars of MD5
-│   │   │   ├── ef/      # 5th-6th chars of MD5
+├── 0/                   # Redis database number
+│   ├── ab/              # First 2 characters of MD5
+│   │   ├── cd/          # 3rd-4th characters of MD5
+│   │   │   ├── ef/      # 5th-6th characters of MD5
 │   │   │   │   └── abcdef1234567890abcdef1234567890.json
 ```
 
@@ -333,10 +312,10 @@ File content format:
 
 ## Feature Progress
 
-> Continuous improvement
+> Continuously improving
 
 - **General Operations**
-  - [x] Get - Retrieve data
+  - [x] Get - Get data
   - [x] Set - Store data
   - [x] Del - Delete key-value
   - [ ] Exists - Check if key exists
@@ -349,10 +328,10 @@ File content format:
 
 - **String Operations**
   - [ ] SetNX - Set if not exists
-  - [ ] SetEX - Set with expiration time
-  - [ ] Incr/IncrBy - Increment numeric value
-  - [ ] Decr/DecrBy - Decrement numeric value
-  - [ ] MGet/MSet - Batch get/set multiple key-value pairs
+  - [ ] SetEX - Set with expiration
+  - [ ] Incr/IncrBy - Increment number
+  - [ ] Decr/DecrBy - Decrement number
+  - [ ] MGet/MSet - Batch get/set multiple keys
 
 - **Hash Operations**
   - [ ] HSet/HGet - Set/get hash field
@@ -374,7 +353,7 @@ File content format:
   - [ ] SCard - Get set cardinality
   - [ ] SIsMember - Check if element is in set
 
-### Cannot be supported in fallback mode
+### Features Not Supported in Fallback Mode
 
 - **Blocking Operations**
   - BLPop/BRPop - Blocking left/right pop
@@ -395,7 +374,7 @@ File content format:
 
 ## License
 
-This source code project is licensed under the [MIT](https://github.com/pardnchiu/go-redis-fallback/blob/main/LICENSE) License.
+This source code project is licensed under the [MIT](LICENSE) license.
 
 ## Author
 

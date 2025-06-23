@@ -1,17 +1,22 @@
-# Redis Fallback (Golang)
+# Redis 備援機制 (Golang)
 
-> 一個 Redis 容錯套件，當 Redis 不可用時自動降級至本地存儲，確保回退期間的最小資料遺失，並在 Redis 恢復可用時實現無縫復原。<br>
+> 一個 Golang Redis 降級方案，當連線不可用時自動降級至本地存儲，並在連線恢復時實現自動復原。<br>
 > 延伸自 [php-redis](https://github.com/pardnchiu/php-redis)、[php-cache-fallback](https://github.com/pardnchiu/php-cache-fallback) 和 [php-session-fallback](https://github.com/pardnchiu/php-session-fallback) 的整合概念，為 Golang 提供統一解決方案。
 
-[![license](https://img.shields.io/github/license/pardnchiu/go-redis-fallback)](https://github.com/pardnchiu/go-redis-fallback/blob/main/LICENSE)
+[![license](https://img.shields.io/github/license/pardnchiu/go-redis-fallback)](LICENSE)
 [![version](https://img.shields.io/github/v/tag/pardnchiu/go-redis-fallback)](https://github.com/pardnchiu/go-redis-fallback/releases)
-[![readme](https://img.shields.io/badge/readme-English-blue)](https://github.com/pardnchiu/go-redis-fallback/blob/main/README.md)
+[![readme](https://img.shields.io/badge/readme-English-blue)](README.md)
 
 ## 三大主軸
 
-- **三層儲存架構**：記憶體快取 + Redis + 本地檔案儲存，具備自動容錯機制
-- **自動復原**：定期監控 Redis 健康狀態，復原後批次同步資料
-- **資料持久化**：回退模式期間將資料儲存為 JSON 檔案以防止遺失，支援 TTL
+### 三層儲存架構
+記憶體快取 + Redis + 本地檔案儲存，具備自動容錯機制
+
+### 優雅降級並自動復原 
+降級時會定期監控 Redis 健康狀態，在連線復原時自動同步資料與清理本地檔案
+
+### 確保資料完整度
+回退模式期間將資料儲存為 JSON 檔案以防止遺失，並支援 TTL
 
 ## 流程圖
 
@@ -115,7 +120,7 @@ flowchart TD
 
 </details>
 
-## 相依套件
+## 依賴套件
 
 - [`github.com/redis/go-redis/v9`](https://github.com/redis/go-redis/v9)
 - [`github.com/pardnchiu/go-logger`](https://github.com/pardnchiu/go-logger)
@@ -139,7 +144,6 @@ import (
 )
 
 func main() {
-  // 最小配置
   config := rf.Config{
     Redis: &rf.Redis{
       Host:     "localhost",
@@ -149,7 +153,7 @@ func main() {
     },
   }
 
-  // 初始化 Redis 容錯機制
+  // 初始化
   client, err := rf.New(config)
   if err != nil {
     log.Fatal(err)
@@ -173,7 +177,7 @@ func main() {
 }
 ```
 
-### 配置詳細說明
+## 配置介紹
 
 ```go
 type Config struct {
@@ -206,23 +210,42 @@ type Options struct {
 }
 ```
 
-## 支援的操作
+## 可用函式
 
-### 核心方法
+### 實例管理
 
-```go
-// 儲存資料（可選 TTL）
-err := client.Set("key", value, ttl)
+- **New** - 建立新的備援實例
+  ```go
+  client, err := rf.New(config)
+  ```
+  - 初始化 Redis 連接
+  - 設定日誌系統
+  - 檢查未同步檔案
 
-// 取得資料
-value, err := client.Get("key")
+- **Close** - 關閉 Redis 容錯客戶端
+  ```go
+  err := client.Close()
+  ```
+  - 關閉 Redis 連接
+  - 清空待處理寫入
+  - 釋放系統資源
 
-// 刪除資料
-err := client.Del("key")
+### 資料管理
 
-// 關閉客戶端並清理資源
-err := client.Close()
-```
+- **Set** - 插入資料，Redis 失效時自動切換至本地儲存
+  ```go
+  err := client.Set("key", value, ttl)
+  ```
+
+- **Get** - 取得資料，記憶體快取為第一層，Redis 為第二層，本地檔案為回退層
+  ```go
+  value, err := client.Get("key")
+  ```
+
+- **Del** - 刪除資料
+  ```go
+  err := client.Del("key")
+  ```
 
 ### 儲存模式
 
@@ -238,45 +261,6 @@ err := client.Close()
 // 3. 批次寫入本地檔案
 // 4. 監控 Redis 健康狀態
 ```
-
-## 核心功能
-
-### 連接管理
-
-- **New** - 建立新的 Redis 容錯客戶端
-  ```go
-  client, err := rf.New(config)
-  ```
-  - 初始化 Redis 連接
-  - 設定日誌系統
-  - 檢查未同步檔案
-  - 以適當模式啟動
-
-- **Close** - 關閉 Redis 容錯客戶端
-  ```go
-  err := client.Close()
-  ```
-  - 關閉 Redis 連接
-  - 清空待處理寫入
-  - 釋放系統資源
-
-### 儲存功能
-
-- **三層架構** - 記憶體快取為第一層，Redis 為第二層，本地檔案為回退層
-  ```go
-  value, err := client.Get("key") // 檢查記憶體 → Redis → 本地檔案
-  ```
-
-- **自動回退** - Redis 失效時無縫切換至本地儲存
-  ```go
-  err := client.Set("key", value, ttl) // Redis 失效時回退至本地儲存
-  ```
-
-- **智慧復原** - Redis 恢復可用時批次同步資料
-  ```go
-  // 健康檢查期間自動觸發
-  // 將記憶體和檔案資料同步回 Redis
-  ```
 
 ### 回退流程
 
@@ -298,14 +282,6 @@ err := client.Close()
   // 檔案根據金鑰雜湊儲存在巢狀目錄中
   // JSON 格式包含中繼資料：金鑰、資料、類型、時間戳、TTL
   ```
-
-## 安全功能
-
-- **資料完整性**：記憶體、Redis 和本地儲存間的資料一致性
-- **原子操作**：防止模式切換期間的資料損壞
-- **TTL 管理**：所有儲存層的自動過期處理
-- **分層結構**：基於 MD5 的目錄結構防止檔案系統瓶頸
-- **並發安全**：具備適當鎖定機制的執行緒安全操作
 
 ## 檔案儲存結構
 
@@ -395,7 +371,7 @@ err := client.Close()
 
 ## 授權條款
 
-此原始碼專案採用 [MIT](https://github.com/pardnchiu/go-redis-fallback/blob/main/LICENSE) 授權。
+此原始碼專案採用 [MIT](LICENSE) 授權。
 
 ## 作者
 
