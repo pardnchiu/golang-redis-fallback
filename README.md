@@ -126,7 +126,7 @@ flowchart TD
 ## Dependencies
 
 - [`github.com/redis/go-redis/v9`](https://github.com/redis/go-redis/v9)
-- [`github.com/pardnchiu/go-logger`](https://github.com/pardnchiu/go-logger)
+- [`github.com/pardnchiu/go-logger`](https://github.com/pardnchiu/go-logger): If you don't need this dependency, you can fork the project and replace it with your preferred logging solution. You can also vote [here](https://forms.gle/EvNLwzpHfxWR2gmP6) to let me know your preference.
 
 ## Usage
 
