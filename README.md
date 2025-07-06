@@ -6,6 +6,8 @@
 > 延伸自 [php-redis](https://github.com/pardnchiu/php-redis)、[php-cache-fallback](https://github.com/pardnchiu/php-cache-fallback) 和 [php-session-fallback](https://github.com/pardnchiu/php-session-fallback) 的整合概念<br>
 > Extended from the integrated concepts of [php-redis](https://github.com/pardnchiu/php-redis), [php-cache-fallback](https://github.com/pardnchiu/php-cache-fallback), and [php-session-fallback](https://github.com/pardnchiu/php-session-fallback), providing a unified solution.
 
+
+![lang](https://img.shields.io/github/languages/top/pardnchiu/go-redis-fallback)
 [![license](https://img.shields.io/github/license/pardnchiu/go-redis-fallback)](LICENSE)
 [![version](https://img.shields.io/github/v/tag/pardnchiu/go-redis-fallback)](https://github.com/pardnchiu/go-redis-fallback/releases)
 
